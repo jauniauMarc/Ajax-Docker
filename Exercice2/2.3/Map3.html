@@ -1,14 +1,15 @@
-<!DOCTYPE html >
+<!DOCTYPE html> 
 <html>
 <head>
     <meta charset="utf-8">
-    <title>json Employes</title>
+    <title>JSON Employes</title>
 </head>
 <body>
 
 <h1>JRostand Reperes Stade</h1>
 <hr>
 <div id="map">...</div>
+
 <style type="text/css">
     /* Always set the map height explicitly to define the size of the div
      * element that contains the map. */
@@ -17,51 +18,58 @@
     }
 
     /* Optional: Makes the sample page fill the window. */
-    html,
-    body {
+    html, body {
         height: 100%;
         margin: 0;
         padding: 0;
     }
 </style>
 
-<script   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo&callback=initMap"></script>
-<script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo&callback=initMap"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
     // au chargement de la page
-    window.onload = loadDoc();
-
+    window.onload = loadDoc;
 
     // Ajax avec JQuery
     function loadDoc() {
         $.ajax({
-                url: "http://localhost:8080/Exercice2/2.3/Marker.json",
-                method: "GET",
-                //data: { id : menuId },
-                dataType: "JSON",
-                success: function(markers){
-                            /* markers representera un objet JSON retourné par le serveur */
-                            /*
-                                compléter le code de la fonction afin d'afficher les chaque coordonnée  à la console
-                            */
+            url: "http://localhost:8080/Exercice2/2.3/Marker.json",
+            method: "GET",
+            dataType: "JSON",
+            success: function (markers) {
+                
+                for (let i = 0; i < markers.length; i++) {
+                    console.log('markers N°[' + i + ']=');
+                    for (let key in markers[i]) {
+                        console.log(key + ' : ' + markers[i][key]);
+                    }
+                }
 
-                            /*
-                                vous utiliserez deux boucles for
-                                - boucle for classique sur markers
-                                - boucle for in sur marker
-                             */
-
-                            /*
-                                Créer des markers Google avec l'API Google Maps en utilisant l'objet renvoyé par
-                                le serveur web. Afficher votre map.
-                             */
-                        }
+                initMap(markers);
             }
-        );
-    };
+        });
+    }
 
+    function initMap(markers) {
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 15,
+            center: { lat: 48.95930033308523, lng: 2.5477890651742516 },
+        });
 
+        for (let i = 0; i < markers.length; i++) {
+            new google.maps.Marker({
+                position: { lat: markers[i].lat, lng: markers[i].lng },
+                map: map,
+            });
+        }
+    }
+
+    
+        
+
+    window.initMap = initMap;
 </script>
 
 </body>
