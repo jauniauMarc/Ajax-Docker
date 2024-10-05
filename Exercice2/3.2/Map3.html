@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>JSON Employes</title>
+</head>
+
+<body>
+
+    <h1>JRostand Reperes Stade</h1>
+    <hr>
+    <div id="map">...</div>
+
+    <style type="text/css">
+        /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo&callback=initMap"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        // au chargement de la page
+        window.onload = loadDoc;
+
+        // Ajax avec JQuery
+        function loadDoc() {
+            $.ajax({
+                url: "./Marker.json",
+                method: "GET",
+                dataType: "JSON",
+                success: function (markers) {
+                    for (let i = 0; i < markers.length; i++) {
+                        console.log('markers N°[' + i + ']=');
+                        for (let key in markers[i]) {
+                            console.log(key + ' : ' + markers[i][key]);
+                        }
+                    }
+
+                    initMap(markers);
+                }
+            });
+        }
+
+        async function initMap(markers) {
+            const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+                "marker",
+            );
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 5,
+                center: { lat: 48.95930033308523, lng: 2.5477890651742516 },
+
+            });
+
+
+            /*relier les maqueurs*/
+            const flightPath = new google.maps.Polyline({
+                path: markers,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+
+            /*afficher les lignes*/
+            flightPath.setMap(map);
+
+            // Create the markers.
+            markers.forEach((markerData, index) => {
+                const marker = new google.maps.Marker({
+                    position: { lat: markerData.lat, lng: markerData.lng },
+                    map: map,
+                    title: markerData.title
+                })
+
+                const France =
+                    '<div id="content">' +
+                    '<div id="siteNotice">' +
+                    "</div>" +
+                    '<h1 id="firstHeading" class="firstHeading">France <--> Canada</h1>' +
+                    '<div id="bodyContent">' +
+                    "<p><b>La France</b> est un pays situé en Europe de l'Ouest, connu pour sa riche histoire, son art et sa culture. La capitale, Paris, est célèbre pour ses monuments emblématiques tels que la Tour Eiffel et le Musée du Louvre. La France est également réputée pour ses traditions culinaires, sa mode et ses paysages magnifiques, allant des champs de lavande de Provence aux sommets enneigés des Alpes.</p>" +
+                    "<p><b>Le Canada</b>, quant à lui, est le deuxième plus grand pays du monde, situé en Amérique du Nord. Il est connu pour sa culture diversifiée, ses paysages naturels époustouflants et sa population accueillante. Les grandes villes comprennent Toronto, Vancouver et Montréal, chacune offrant des attractions uniques, comme la Tour CN et le vieux Montréal. Le Canada est célèbre pour ses parcs nationaux, ses lacs magnifiques et les aurores boréales.</p>" +
+                    '<p>Les deux pays partagent une relation étroite, avec des liens historiques, des échanges culturels et un partenariat solide dans divers domaines internationaux.</p>' +
+                    "</div>" +
+                    "</div>";
+                const infowindow = new google.maps.InfoWindow({
+                    content: France,
+                    ariaLabel: "Uluru",
+                });
+
+                marker.addListener("click", () => {
+                    infowindow.open({
+                        anchor: marker,
+                        map,
+                    });
+                });
+            });
+        }
+
+        window.initMap = initMap;
+    </script>
+
+</body>
+
+</html>
