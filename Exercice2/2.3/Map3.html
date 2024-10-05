@@ -51,10 +51,15 @@
         });
     }
 
-    function initMap(markers) {
+    async function initMap(markers) {
+        const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+            "marker",
+        );        
         const map = new google.maps.Map(document.getElementById("map"), {
             zoom: 15,
             center: { lat: 48.95930033308523, lng: 2.5477890651742516 },
+            
         });
 
         for (let i = 0; i < markers.length; i++) {
@@ -65,7 +70,7 @@
         }
     
 
-  /*relier le maqueurs*/ 
+  /*relier les maqueurs*/ 
   const flightPath = new google.maps.Polyline({
     path: markers,
     geodesic: true,
@@ -74,9 +79,27 @@
     strokeWeight: 2,
   });
 
+  /*afficher les lignes*/
   flightPath.setMap(map);
 
-    }    
+  const infoWindow = new InfoWindow();
+
+// Create the markers.
+markers.forEach((markerData, index) => {
+            const marker = new google.maps.Marker({
+                position: { lat: markerData.lat, lng: markerData.lng },
+                map: map,
+                title: markerData.title
+            });
+
+
+  // Add a click listener for each marker, and set up the info window.
+  marker.addListener("click", () => {
+    infoWindow.setContent(marker.title);
+    infoWindow.open(map, marker);
+  });
+});
+}    
 
     window.initMap = initMap;
 </script>
